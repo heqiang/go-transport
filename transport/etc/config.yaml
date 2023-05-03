@@ -1,0 +1,13 @@
+serviceName: transport
+Port: "8081"
+Kafka:
+  Name: "kf"
+  Brokers:
+    - "127.0.0.1:9092"
+  Topic: news-data
+  Group: news
+  Consumers: 16
+Elasticsearch:
+  Hosts:
+    - http://127.0.0.1:9200
+  Index: "{.event}-{{yyyy-MM-dd}}"
