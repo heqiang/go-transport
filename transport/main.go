@@ -2,12 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"news_data_transport/transport/config"
-	"news_data_transport/transport/service/kf"
-
-	"github.com/gin-gonic/gin"
 	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/proc"
+	"github.com/zeromicro/go-zero/core/service"
+	"news_data_transport/transport/config"
 )
 
 var configFile = flag.String("f", "etc/config.yaml", "Specify the config file")
@@ -17,10 +15,34 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-	kf.KfConsumer(c)
+	proc.SetTimeToForceQuit(c.GracePeriod)
 
-	g := gin.Default()
+	group := service.NewServiceGroup()
+	defer group.Stop()
 
-	g.Run(fmt.Sprintf(":%s", c.Port))
-
+	//for _,processor:=range c.Clusters{
+	//	client,err:=elastic.NewClient(
+	//		elastic.SetSniff(false),
+	//		elastic.SetURL(processor.ElasticSearch.Hosts...),
+	//		elastic.SetBasicAuth(c.Kq.Username,c.Kq.Password),
+	//		)
+	//	logx.Must(err)
+	//
+	//	writer, err := es.NewWriter(processor.ElasticSearch)
+	//	logx.Must(err)
+	//
+	//	var loc *time.Location
+	//	tz := processor.ElasticSearch.TimeZone
+	//	if len(tz) > 0 {
+	//		loc, err = time.LoadLocation(tz)
+	//		logx.Must(err)
+	//	} else {
+	//		loc = time.Local
+	//	}
+	//
+	//
+	//	indexer := es.
+	//
+	//
+	//}
 }
