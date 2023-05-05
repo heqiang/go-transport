@@ -7,7 +7,7 @@ import (
 	"github.com/zeromicro/go-queue/kq"
 )
 
-func KfConsumer(c config.Config) {
+func Consumer(c config.Config) {
 	q := kq.MustNewQueue(c.Kq, kq.WithHandle(func(k, v string) error {
 		fmt.Printf("=> %s\n", v)
 		return nil
