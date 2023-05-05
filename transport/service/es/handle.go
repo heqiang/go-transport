@@ -3,6 +3,7 @@ package es
 import (
 	"context"
 	"errors"
+	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olivere/elastic/v7"
 	"github.com/zeromicro/go-zero/core/executors"
@@ -54,6 +55,7 @@ func (m *InsertDoc) CreateIndex(index string) (err error) {
 
 }
 func (m *InsertDoc) write(index, val string) error {
+	fmt.Println("消费者:", val)
 	return m.inserter.Add(valueWithIndex{
 		index: index,
 		val:   val,

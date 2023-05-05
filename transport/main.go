@@ -49,13 +49,13 @@ func main() {
 	for _, processor := range c.Clusters {
 		client, err := elastic.NewClient(
 			elastic.SetSniff(false),
-			elastic.SetURL(processor.ElasticSearch.Hosts...),
-			elastic.SetBasicAuth(processor.ElasticSearch.Username, processor.ElasticSearch.Password),
+			elastic.SetURL(processor.Output.ElasticSearch.Hosts...),
+			elastic.SetBasicAuth(processor.Output.ElasticSearch.Username, processor.Output.ElasticSearch.Password),
 		)
 		logx.Must(err)
 
-		handle := es.NewHandle(client, processor.ElasticSearch.Index, processor.ElasticSearch)
-		for _, k := range toKqConf(processor.Kafka) {
+		handle := es.NewHandle(client, processor.Output.ElasticSearch.Index, processor.Output.ElasticSearch)
+		for _, k := range toKqConf(processor.Input.Kafka) {
 			group.Add(kq.MustNewQueue(k, handle))
 		}
 	}

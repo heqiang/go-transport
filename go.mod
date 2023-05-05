@@ -3,6 +3,7 @@ module news_data_transport
 go 1.20
 
 require (
+	github.com/json-iterator/go v1.1.12
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/vjeantet/jodaTime v1.0.0
 	github.com/zeromicro/go-queue v1.1.8
@@ -26,6 +27,8 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/openzipkin/zipkin-go v0.4.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
