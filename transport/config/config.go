@@ -17,7 +17,7 @@ type (
 		Username      string `json:",optional"`
 		Password      string `json:",optional"`
 	}
-	KafkaConf struct {
+	KqConf struct {
 		service.ServiceConf
 		Brokers    []string
 		Group      string
@@ -33,7 +33,7 @@ type (
 	}
 	Cluster struct {
 		Input struct {
-			Kafka KafkaConf
+			Kafka KqConf
 		}
 		Output struct {
 			ElasticSearch EsConf

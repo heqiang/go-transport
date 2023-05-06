@@ -66,10 +66,12 @@ func getMapping() string {
         "type": "integer"
       },
       "publish_time":{
-        "type": "date"
+        "type": "date",
+		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
       },
       "insert_time":{
-        "type": "date"
+        "type": "date",
+		"format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
       },
       "site_id":{
         "type": "keyword"

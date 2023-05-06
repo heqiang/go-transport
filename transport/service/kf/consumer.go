@@ -2,13 +2,13 @@ package kf
 
 import (
 	"fmt"
-	"news_data_transport/transport/config"
 
 	"github.com/zeromicro/go-queue/kq"
 )
 
-func Consumer(c config.Config) {
-	q := kq.MustNewQueue(c.Kq, kq.WithHandle(func(k, v string) error {
+func Consumer() {
+	var c kq.KqConf
+	q := kq.MustNewQueue(c, kq.WithHandle(func(k, v string) error {
 		fmt.Printf("=> %s\n", v)
 		return nil
 	}))
