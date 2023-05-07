@@ -1,4 +1,4 @@
-# go-stash简介
+# go-transport简介
 
 go-transport是一个高效的从Kafka获取,根据es的索引配置,然后发送到ElasticSearch集群的工具。  
 本项目借鉴了[go-stash](https://github.com/kevwan/go-stash) 项目
