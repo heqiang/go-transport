@@ -3,12 +3,12 @@ package es
 import (
 	"context"
 	"errors"
-	"fmt"
+	"news_data_transport/transport/config"
+
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olivere/elastic/v7"
 	"github.com/zeromicro/go-zero/core/executors"
 	"github.com/zeromicro/go-zero/core/logx"
-	"news_data_transport/transport/config"
 )
 
 var NetWorkError = errors.New("网络错误")
@@ -34,12 +34,8 @@ func NewHandle(client *elastic.Client, index string, c config.EsConf) *InsertDoc
 	return writer
 }
 
-func (m *InsertDoc) IndexExists(index string) (bool, error) {
-	return m.client.IndexExists(index).Do(context.Background())
-}
-
 func (m *InsertDoc) CreateIndex(index string) (err error) {
-	exists, err := m.IndexExists(index)
+	exists, err := m.client.IndexExists(index).Do(context.Background())
 	if err != nil {
 		return NetWorkError
 	}
@@ -55,7 +51,6 @@ func (m *InsertDoc) CreateIndex(index string) (err error) {
 
 }
 func (m *InsertDoc) write(index, val string) error {
-	fmt.Println("消费者:", val)
 	return m.inserter.Add(valueWithIndex{
 		index: index,
 		val:   val,
