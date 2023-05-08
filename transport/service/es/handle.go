@@ -3,7 +3,11 @@ package es
 import (
 	"context"
 	"errors"
+	"github.com/zeromicro/go-zero/core/fx"
+	"github.com/zeromicro/go-zero/core/lang"
+	"github.com/zeromicro/go-zero/core/syncx"
 	"news_data_transport/transport/config"
+	"sync"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/olivere/elastic/v7"
@@ -15,9 +19,12 @@ var NetWorkError = errors.New("网络错误")
 
 type (
 	InsertDoc struct {
-		client   *elastic.Client
-		index    string
-		inserter *executors.ChunkExecutor
+		client       *elastic.Client
+		index        string
+		inserter     *executors.ChunkExecutor
+		indices      map[string]lang.PlaceholderType
+		lock         sync.RWMutex
+		singleFlight syncx.SingleFlight
 	}
 	valueWithIndex struct {
 		index string
@@ -27,27 +34,46 @@ type (
 
 func NewHandle(client *elastic.Client, index string, c config.EsConf) *InsertDoc {
 	writer := &InsertDoc{
-		client: client,
-		index:  index,
+		client:       client,
+		index:        index,
+		indices:      make(map[string]lang.PlaceholderType),
+		singleFlight: syncx.NewSingleFlight(),
 	}
 	writer.inserter = executors.NewChunkExecutor(writer.execute, executors.WithChunkBytes(c.MaxChunkBytes))
 	return writer
 }
 
 func (m *InsertDoc) CreateIndex(index string) (err error) {
-	exists, err := m.client.IndexExists(index).Do(context.Background())
-	if err != nil {
-		return NetWorkError
-	}
-	if exists {
-		return err
-	} else {
-		_, err = m.client.CreateIndex(index).Body(getMapping()).Do(context.Background())
-		if err != nil {
-			return err
+	_, err = m.singleFlight.Do(index, func() (any, error) {
+		m.lock.RLock()
+		defer m.lock.RUnlock()
+
+		if _, ok := m.indices[index]; ok {
+			return nil, nil
 		}
-		return nil
-	}
+		existsService := elastic.NewIndicesExistsService(m.client)
+		existsService.Index([]string{index})
+		exist, err := existsService.Do(context.Background())
+		if err != nil {
+			return nil, NetWorkError
+		}
+		if exist {
+			return nil, err
+		}
+
+		createService := m.client.CreateIndex(index).Body(getMapping())
+		if err := fx.DoWithRetry(func() error {
+			_, err := createService.Do(context.Background())
+			return err
+		}); err != nil {
+			return nil, err
+		}
+
+		return nil, nil
+
+	})
+
+	return err
 
 }
 func (m *InsertDoc) write(index, val string) error {
